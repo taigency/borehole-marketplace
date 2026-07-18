@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 // Page routes that require an authenticated session. API routes enforce their
 // own auth (returning 401 JSON rather than redirecting), so they are not listed
 // here.
-const PROTECTED_PREFIXES = ['/dashboard', '/checkout']
+const PROTECTED_PREFIXES = ['/dashboard']
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
