@@ -1,12 +1,13 @@
 'use client'
 
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { CheckCircle, Package, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 
-export default function CheckoutSuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get('orderId')
 
@@ -53,5 +54,13 @@ export default function CheckoutSuccessPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center">Loading...</div>}>
+      <SuccessContent />
+    </Suspense>
   )
 }

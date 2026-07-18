@@ -1,12 +1,9 @@
 -- Borehole Marketplace Database Schema
 -- Run this in Supabase SQL Editor
 
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- Users table
 CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email VARCHAR(255) UNIQUE NOT NULL,
   phone VARCHAR(20),
   name VARCHAR(255) NOT NULL,
@@ -23,7 +20,7 @@ CREATE TABLE users (
 
 -- Suppliers table
 CREATE TABLE suppliers (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   company_name VARCHAR(255) NOT NULL,
   description TEXT,
@@ -41,7 +38,7 @@ CREATE TABLE suppliers (
 
 -- Services table
 CREATE TABLE services (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   provider_id UUID REFERENCES users(id) ON DELETE CASCADE,
   title VARCHAR(255) NOT NULL,
   description TEXT,
@@ -59,7 +56,7 @@ CREATE TABLE services (
 
 -- Products table
 CREATE TABLE products (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   supplier_id UUID REFERENCES suppliers(id) ON DELETE CASCADE,
   name VARCHAR(255) NOT NULL,
   description TEXT,
@@ -79,7 +76,7 @@ CREATE TABLE products (
 
 -- Leads table
 CREATE TABLE leads (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   source VARCHAR(50) DEFAULT 'website',
   customer_name VARCHAR(255),
   customer_email VARCHAR(255),
@@ -100,7 +97,7 @@ CREATE TABLE leads (
 
 -- Orders table
 CREATE TABLE orders (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_number VARCHAR(20) UNIQUE NOT NULL,
   customer_id UUID REFERENCES users(id),
   supplier_id UUID REFERENCES suppliers(id),
@@ -123,7 +120,7 @@ CREATE TABLE orders (
 
 -- Order items table
 CREATE TABLE order_items (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id),
   product_name VARCHAR(255),
@@ -135,7 +132,7 @@ CREATE TABLE order_items (
 
 -- Quotes table
 CREATE TABLE quotes (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   lead_id UUID REFERENCES leads(id),
   provider_id UUID REFERENCES users(id),
   amount DECIMAL(10, 2),
@@ -148,7 +145,7 @@ CREATE TABLE quotes (
 
 -- Reviews table
 CREATE TABLE reviews (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reviewer_id UUID REFERENCES users(id),
   target_type VARCHAR(20) CHECK (target_type IN ('supplier', 'service', 'product')),
   target_id UUID,

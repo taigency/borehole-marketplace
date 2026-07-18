@@ -1,12 +1,13 @@
 'use client'
 
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { XCircle, ArrowRight, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 
-export default function CheckoutCancelPage() {
+function CancelContent() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get('orderId')
 
@@ -48,5 +49,13 @@ export default function CheckoutCancelPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function CheckoutCancelPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center">Loading...</div>}>
+      <CancelContent />
+    </Suspense>
   )
 }
