@@ -1,5 +1,7 @@
 // Yoco Payment Gateway Integration
 
+import crypto from 'crypto'
+
 const YOCO_CONFIG = {
   publicKey: process.env.NEXT_PUBLIC_YOCO_PUBLIC_KEY || '',
   secretKey: process.env.YOCO_SECRET_KEY || '',
@@ -69,16 +71,47 @@ export async function verifyYocoPayment(
   }
 }
 
+/**
+ * Verifies a Yoco webhook using its Svix-style signing scheme.
+ *
+ * Yoco signs `${webhook-id}.${webhook-timestamp}.${body}` with an HMAC-SHA256
+ * keyed by the base64 material of the webhook signing secret (the part after
+ * the `whsec_` prefix), and sends the result base64-encoded in the
+ * `webhook-signature` header as one or more space-separated `v1,<sig>` tokens.
+ *
+ * Pass the RAW request body (not re-serialised JSON) and the relevant headers.
+ * Comparison is constant-time to avoid leaking the signature via timing.
+ */
 export function verifyYocoWebhook(
   payload: string,
-  signature: string
+  headers: {
+    id: string | null
+    timestamp: string | null
+    signature: string | null
+  }
 ): boolean {
-  // Yoco uses HMAC SHA256 for webhook verification
-  const crypto = require('crypto')
-  const expectedSignature = crypto
-    .createHmac('sha256', YOCO_CONFIG.secretKey)
-    .update(payload)
-    .digest('hex')
+  const secret = process.env.YOCO_WEBHOOK_SECRET || ''
+  if (!secret || !headers.id || !headers.timestamp || !headers.signature) {
+    return false
+  }
 
-  return signature === expectedSignature
+  // The signing key is the base64 payload after the `whsec_` prefix.
+  const secretBytes = Buffer.from(secret.replace(/^whsec_/, ''), 'base64')
+  const signedContent = `${headers.id}.${headers.timestamp}.${payload}`
+
+  const expected = crypto
+    .createHmac('sha256', secretBytes)
+    .update(signedContent)
+    .digest('base64')
+  const expectedBuf = Buffer.from(expected)
+
+  // The header may carry multiple space-separated `v1,<signature>` tokens.
+  return headers.signature.split(' ').some((token) => {
+    const provided = token.includes(',') ? token.split(',')[1] : token
+    const providedBuf = Buffer.from(provided)
+    return (
+      providedBuf.length === expectedBuf.length &&
+      crypto.timingSafeEqual(providedBuf, expectedBuf)
+    )
+  })
 }

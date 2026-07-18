@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { calculateCommission, calculateShipping, COMMISSION_RATE } from '@/lib/pricing'
 
 interface CartItem {
   id: string
@@ -50,8 +51,9 @@ export default function CartPage() {
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const discount = promoApplied ? Math.round(subtotal * 0.05) : 0
-  const shipping = subtotal > 5000 ? 0 : 350
-  const total = subtotal - discount + shipping
+  const commission = calculateCommission(subtotal)
+  const shipping = calculateShipping(subtotal)
+  const total = subtotal + commission + shipping - discount
 
   if (items.length === 0) {
     return (
@@ -188,6 +190,10 @@ export default function CartPage() {
                   <span className="font-medium">-R{discount.toLocaleString()}</span>
                 </div>
               )}
+              <div className="flex justify-between">
+                <span className="text-gray-500">Platform fee ({Math.round(COMMISSION_RATE * 100)}%)</span>
+                <span className="font-medium text-gray-900">R{commission.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</span>
+              </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Shipping</span>
                 <span className={cn('font-medium', shipping === 0 ? 'text-emerald-600' : 'text-gray-900')}>

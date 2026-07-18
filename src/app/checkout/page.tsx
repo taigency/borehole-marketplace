@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { formatCurrency, cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { calculateCommission, calculateShipping, COMMISSION_RATE } from '@/lib/pricing'
 import {
   CreditCard,
   Building2,
@@ -68,8 +69,9 @@ export default function CheckoutPage() {
   })
 
   const subtotal = ORDER_ITEMS.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const shippingCost = subtotal > 5000 ? 0 : 350
-  const total = subtotal + shippingCost
+  const commission = calculateCommission(subtotal)
+  const shippingCost = calculateShipping(subtotal)
+  const total = subtotal + commission + shippingCost
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -405,6 +407,10 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Subtotal</span>
                   <span className="font-medium">{formatCurrency(subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Platform fee ({Math.round(COMMISSION_RATE * 100)}%)</span>
+                  <span className="font-medium">{formatCurrency(commission)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Shipping</span>

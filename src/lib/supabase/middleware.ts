@@ -1,6 +1,11 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Page routes that require an authenticated session. API routes enforce their
+// own auth (returning 401 JSON rather than redirecting), so they are not listed
+// here.
+const PROTECTED_PREFIXES = ['/dashboard', '/checkout']
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -36,15 +41,24 @@ export async function updateSession(request: NextRequest) {
   // IMPORTANT: Use getUser() instead of getSession() in server code.
   // getUser() is safe and hits the Supabase Auth server.
   // getSession() reads from cookies which can be tampered with.
-  await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // Optional: Redirect unauthenticated users to login
-  // const { data: { user } } = await supabase.auth.getUser()
-  // if (!user && !request.nextUrl.pathname.startsWith('/auth')) {
-  //   const url = request.nextUrl.clone()
-  //   url.pathname = '/auth/login'
-  //   return NextResponse.redirect(url)
-  // }
+  // Protect authenticated areas. Unauthenticated users hitting a protected
+  // page are redirected to login with a `redirectedFrom` param so they can be
+  // returned to where they were headed after signing in.
+  const { pathname } = request.nextUrl
+  const isProtected = PROTECTED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  )
+
+  if (!user && isProtected) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/login'
+    url.searchParams.set('redirectedFrom', pathname)
+    return NextResponse.redirect(url)
+  }
 
   return supabaseResponse
 }
