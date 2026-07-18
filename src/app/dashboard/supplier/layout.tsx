@@ -5,18 +5,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
-  LayoutDashboard,
-  Package,
-  ShoppingCart,
-  UserCheck,
-  BarChart3,
-  Settings,
-  Menu,
-  X,
-  LogOut,
-  Bell,
-  ChevronDown,
-  Store,
+  LayoutDashboard, Package, ShoppingCart, UserCheck,
+  BarChart3, Settings, Menu, X, LogOut, Bell,
+  ChevronRight, Droplets,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -38,104 +29,122 @@ export default function SupplierDashboardLayout({ children }: { children: React.
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar overlay */}
+    <div className="min-h-screen bg-[#f8fafc]">
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-50 w-[260px] bg-white border-r border-gray-200/80 transform transition-all duration-300 ease-out lg:translate-x-0',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-            <Link href="/dashboard/supplier" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Store className="h-5 w-5 text-white" />
+          <div className="flex items-center justify-between h-[72px] px-6 border-b border-gray-100">
+            <Link href="/dashboard/supplier" className="flex items-center gap-2.5 group">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm"
+                style={{ background: 'linear-gradient(135deg, #0c4a6e, #0d9488)' }}>
+                <Droplets className="h-5 w-5 text-white" />
               </div>
-              <span className="text-lg font-bold text-gray-900">Supplier</span>
+              <div>
+                <span className="text-[15px] font-bold text-gray-900 tracking-tight">BoreHub</span>
+                <span className="block text-[10px] font-medium text-gray-400 -mt-0.5">Supplier Portal</span>
+              </div>
             </Link>
             <button
-              className="lg:hidden p-1 rounded-md hover:bg-gray-100"
+              className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
               onClick={() => setSidebarOpen(false)}
             >
-              <X className="h-5 w-5 text-gray-500" />
+              <X className="h-4 w-4 text-gray-500" />
             </button>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
-                  isActive(item.href)
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-gray-700 hover:bg-gray-100'
-                )}
-              >
-                <item.icon className="h-5 w-5 flex-shrink-0" />
-                {item.label}
-              </Link>
-            ))}
+          <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+            {NAV_ITEMS.map((item) => {
+              const active = isActive(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={cn(
+                    'group flex items-center gap-3 px-3 py-2.5 text-[13px] font-medium rounded-lg transition-all duration-150',
+                    active
+                      ? 'bg-[#0c4a6e]/5 text-[#0c4a6e]'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  )}
+                >
+                  <div className={cn(
+                    'p-1.5 rounded-md transition-colors',
+                    active ? 'bg-[#0c4a6e]/10' : 'bg-gray-100/80 group-hover:bg-gray-200/60'
+                  )}>
+                    <item.icon className={cn('h-4 w-4', active ? 'text-[#0c4a6e]' : 'text-gray-500')} />
+                  </div>
+                  {item.label}
+                  {active && <ChevronRight className="h-3.5 w-3.5 ml-auto text-[#0c4a6e]/50" />}
+                </Link>
+              )
+            })}
           </nav>
 
-          {/* User section */}
-          <div className="px-3 py-4 border-t border-gray-200">
-            <div className="flex items-center gap-3 px-3 py-2">
-              <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center">
-                <span className="text-sm font-semibold text-primary">BM</span>
+          <div className="px-3 py-4 border-t border-gray-100">
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-bold text-white"
+                style={{ background: 'linear-gradient(135deg, #0c4a6e, #0d9488)' }}>
+                JB
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">BoreMaster Drilling</p>
-                <p className="text-xs text-gray-500 truncate">supplier@boremaster.co.za</p>
+                <p className="text-[13px] font-semibold text-gray-900 truncate">Johan Botha</p>
+                <p className="text-[11px] text-gray-400 truncate">johan@boremaster.co.za</p>
               </div>
-              <button className="p-1 rounded-md hover:bg-gray-100">
-                <LogOut className="h-4 w-4 text-gray-400" />
+              <button className="p-1.5 rounded-md hover:bg-gray-100 transition-colors">
+                <LogOut className="h-3.5 w-3.5 text-gray-400" />
               </button>
             </div>
           </div>
         </div>
       </aside>
 
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top bar */}
-        <header className="sticky top-0 z-30 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6">
+      <div className="lg:pl-[260px]">
+        <header className="sticky top-0 z-30 h-[72px] bg-white/80 backdrop-blur-md border-b border-gray-200/60 flex items-center justify-between px-4 sm:px-6">
           <button
-            className="lg:hidden p-2 rounded-md hover:bg-gray-100"
+            className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu className="h-5 w-5 text-gray-700" />
           </button>
 
+          <div className="hidden lg:block">
+            <h2 className="text-[13px] font-medium text-gray-400">
+              {NAV_ITEMS.find(n => isActive(n.href))?.label || 'Dashboard'}
+            </h2>
+          </div>
+
           <div className="flex items-center gap-2 ml-auto">
-            <button className="relative p-2 rounded-md hover:bg-gray-100">
-              <Bell className="h-5 w-5 text-gray-500" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+            <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+              <Bell className="h-[18px] w-[18px] text-gray-500 group-hover:text-gray-700 transition-colors" />
+              <span className="absolute top-1 right-1 flex items-center justify-center w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-white">
+                5
+              </span>
             </button>
-            <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-gray-200">
-              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                <span className="text-xs font-semibold text-primary">BM</span>
+            <div className="hidden sm:flex items-center gap-3 pl-3 ml-1 border-l border-gray-200/60">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
+                style={{ background: 'linear-gradient(135deg, #0c4a6e, #0d9488)' }}>
+                JB
               </div>
-              <span className="text-sm font-medium text-gray-700">BoreMaster</span>
+              <div>
+                <span className="text-[13px] font-semibold text-gray-800 block leading-tight">Johan Botha</span>
+                <span className="text-[11px] text-gray-400">BoreMaster Drilling</span>
+              </div>
             </div>
           </div>
         </header>
 
-        {/* Page content */}
-        <main>{children}</main>
+        <main className="min-h-[calc(100vh-72px)]">{children}</main>
       </div>
     </div>
   )

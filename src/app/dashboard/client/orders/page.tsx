@@ -1,21 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate, cn } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
-  Package,
-  Truck,
-  CheckCircle,
-  Clock,
-  XCircle,
-  Eye,
-  RotateCcw,
-  ChevronDown,
-  ChevronUp,
-  MapPin,
+  Package, Truck, CheckCircle, Clock, XCircle,
+  Eye, RotateCcw, ChevronDown, ChevronUp,
 } from 'lucide-react'
 
 interface OrderItem {
@@ -38,7 +30,7 @@ interface Order {
 const MOCK_ORDERS: Order[] = [
   {
     id: 'ORD-001',
-    supplier: 'PumpTech SA',
+    supplier: 'BoreMaster Drilling',
     items: [
       { name: 'Submersible Pump 1.5kW', quantity: 1, price: 8500 },
       { name: 'Pump Controller', quantity: 1, price: 2200 },
@@ -57,7 +49,7 @@ const MOCK_ORDERS: Order[] = [
   },
   {
     id: 'ORD-002',
-    supplier: 'Borehole Supplies Co',
+    supplier: 'AquaStore Solutions',
     items: [{ name: 'PVC Casing 160mm x 6m', quantity: 5, price: 1200 }],
     status: 'processing',
     total: 6000,
@@ -73,7 +65,7 @@ const MOCK_ORDERS: Order[] = [
   },
   {
     id: 'ORD-003',
-    supplier: 'AquaStore Solutions',
+    supplier: 'PumpTech SA',
     items: [
       { name: 'Water Tank 2500L', quantity: 1, price: 4500 },
       { name: 'Tank Stand', quantity: 1, price: 1800 },
@@ -111,7 +103,7 @@ const MOCK_ORDERS: Order[] = [
   },
   {
     id: 'ORD-005',
-    supplier: 'PumpTech SA',
+    supplier: 'BoreMaster Drilling',
     items: [{ name: 'Pressure Switch', quantity: 2, price: 650 }],
     status: 'cancelled',
     total: 1300,
@@ -127,12 +119,12 @@ const MOCK_ORDERS: Order[] = [
 const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']
 
 const statusIcons: Record<string, React.ReactNode> = {
-  pending: <Clock className="h-4 w-4" />,
-  confirmed: <CheckCircle className="h-4 w-4" />,
-  processing: <Package className="h-4 w-4" />,
-  shipped: <Truck className="h-4 w-4" />,
-  delivered: <CheckCircle className="h-4 w-4" />,
-  cancelled: <XCircle className="h-4 w-4" />,
+  pending: <Clock className="h-3.5 w-3.5" />,
+  confirmed: <CheckCircle className="h-3.5 w-3.5" />,
+  processing: <Package className="h-3.5 w-3.5" />,
+  shipped: <Truck className="h-3.5 w-3.5" />,
+  delivered: <CheckCircle className="h-3.5 w-3.5" />,
+  cancelled: <XCircle className="h-3.5 w-3.5" />,
 }
 
 const statusVariant: Record<string, 'success' | 'warning' | 'default' | 'error'> = {
@@ -153,51 +145,59 @@ export default function ClientOrdersPage() {
     : MOCK_ORDERS
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
-        <p className="text-gray-600 mt-2">Track and manage your orders</p>
+    <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">My Orders</h1>
+        <p className="text-gray-500 mt-1 text-[14px]">Track and manage your orders</p>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">
-        <Button
-          variant={selectedStatus === '' ? 'primary' : 'outline'}
-          size="sm"
+        <button
           onClick={() => setSelectedStatus('')}
+          className={cn(
+            'px-3.5 py-2 text-[13px] font-medium rounded-lg transition-all',
+            selectedStatus === ''
+              ? 'bg-[#0c4a6e] text-white shadow-sm'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          )}
         >
           All
-        </Button>
+        </button>
         {STATUSES.map((status) => (
-          <Button
+          <button
             key={status}
-            variant={selectedStatus === status ? 'primary' : 'outline'}
-            size="sm"
             onClick={() => setSelectedStatus(status)}
+            className={cn(
+              'px-3.5 py-2 text-[13px] font-medium rounded-lg transition-all',
+              selectedStatus === status
+                ? 'bg-[#0c4a6e] text-white shadow-sm'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            )}
           >
             {status.charAt(0).toUpperCase() + status.slice(1)}
-          </Button>
+          </button>
         ))}
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filteredOrders.map((order) => (
           <Card key={order.id}>
-            <CardContent className="p-6">
+            <CardContent className="p-5">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-gray-900">{order.id}</h3>
-                    <Badge variant={statusVariant[order.status] ?? 'default'}>
+                  <div className="flex items-center gap-2.5 mb-2">
+                    <span className="font-mono font-semibold text-[14px] text-[#0c4a6e]">{order.id}</span>
+                    <Badge variant={statusVariant[order.status] ?? 'default'} className="text-[10px]">
                       <span className="flex items-center gap-1">
                         {statusIcons[order.status]}
                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                       </span>
                     </Badge>
                   </div>
-                  <p className="text-sm text-gray-600 mb-1">
-                    From: <span className="font-medium">{order.supplier}</span>
+                  <p className="text-[13px] text-gray-500 mb-0.5">
+                    From: <span className="font-medium text-gray-700">{order.supplier}</span>
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-[12px] text-gray-400">
                     {order.items.map((item, i) => (
                       <span key={i}>
                         {item.quantity}x {item.name}
@@ -207,14 +207,10 @@ export default function ClientOrdersPage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xl font-bold text-gray-900">
-                    {formatCurrency(order.total)}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {formatDate(order.createdAt)}
-                  </p>
+                  <p className="text-[18px] font-bold text-gray-900">{formatCurrency(order.total)}</p>
+                  <p className="text-[11px] text-gray-400 mt-0.5">{formatDate(order.createdAt)}</p>
                   {order.trackingNumber && (
-                    <p className="text-sm text-primary mt-1">
+                    <p className="text-[11px] text-[#0c4a6e] font-medium mt-0.5">
                       Tracking: {order.trackingNumber}
                     </p>
                   )}
@@ -225,38 +221,39 @@ export default function ClientOrdersPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    setExpandedOrder(expandedOrder === order.id ? null : order.id)
-                  }
+                  className="h-8 text-[12px]"
+                  onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
                 >
-                  <Eye className="h-4 w-4 mr-1" />
+                  <Eye className="h-3.5 w-3.5 mr-1.5" />
                   Track Order
                   {expandedOrder === order.id ? (
-                    <ChevronUp className="h-4 w-4 ml-1" />
+                    <ChevronUp className="h-3.5 w-3.5 ml-1.5" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 ml-1" />
+                    <ChevronDown className="h-3.5 w-3.5 ml-1.5" />
                   )}
                 </Button>
-                <Button variant="outline" size="sm">
-                  <RotateCcw className="h-4 w-4 mr-1" />
+                <Button variant="outline" size="sm" className="h-8 text-[12px]">
+                  <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
                   Reorder
                 </Button>
               </div>
 
               {expandedOrder === order.id && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-4">Order Status Timeline</h4>
+                  <h4 className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-4">Order Status Timeline</h4>
                   <div className="relative">
                     <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
                     <div className="space-y-4">
                       {order.timeline.map((step, index) => (
                         <div key={index} className="flex items-center gap-4 relative">
                           <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
+                            className={cn(
+                              'w-8 h-8 rounded-full flex items-center justify-center z-10',
                               step.completed
-                                ? 'bg-primary text-white'
+                                ? 'text-white'
                                 : 'bg-gray-200 text-gray-400'
-                            }`}
+                            )}
+                            style={step.completed ? { background: 'linear-gradient(135deg, #0c4a6e, #0d9488)' } : undefined}
                           >
                             {step.completed ? (
                               <CheckCircle className="h-4 w-4" />
@@ -265,11 +262,11 @@ export default function ClientOrdersPage() {
                             )}
                           </div>
                           <div>
-                            <p className={`text-sm font-medium ${step.completed ? 'text-gray-900' : 'text-gray-400'}`}>
+                            <p className={cn('text-[13px] font-medium', step.completed ? 'text-gray-900' : 'text-gray-400')}>
                               {step.step}
                             </p>
                             {step.date && (
-                              <p className="text-xs text-gray-500">{formatDate(step.date)}</p>
+                              <p className="text-[11px] text-gray-400">{formatDate(step.date)}</p>
                             )}
                           </div>
                         </div>
@@ -284,9 +281,12 @@ export default function ClientOrdersPage() {
       </div>
 
       {filteredOrders.length === 0 && (
-        <div className="text-center py-12">
-          <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">No orders found for this status.</p>
+        <div className="text-center py-16">
+          <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Package className="h-7 w-7 text-gray-300" />
+          </div>
+          <p className="text-[14px] font-medium text-gray-500">No orders found</p>
+          <p className="text-[12px] text-gray-400 mt-1">Try adjusting your filter</p>
         </div>
       )}
     </div>

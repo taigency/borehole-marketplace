@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Edit2, MapPin, DollarSign, Eye, EyeOff, X, Check, Wrench } from 'lucide-react'
+import {
+  Plus, Edit2, MapPin, DollarSign, Eye, EyeOff, X, Check, Wrench,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { SERVICE_CATEGORIES, PROVINCES } from '@/lib/constants'
 
 interface ProviderService {
   id: string
@@ -19,22 +21,59 @@ interface ProviderService {
 }
 
 const INITIAL_SERVICES: ProviderService[] = [
-  { id: '1', title: 'Professional Borehole Drilling', category: 'drilling', priceType: 'per_meter', priceRange: { min: 350, max: 600 }, coverageAreas: ['Gauteng', 'Mpumalanga', 'Limpopo'], description: 'Complete borehole drilling services for residential, commercial, and agricultural applications up to 200m depth.', available: true },
-  { id: '2', title: 'Borehole Deepening & Rehabilitation', category: 'maintenance', priceType: 'quote', priceRange: { min: 5000, max: 25000 }, coverageAreas: ['Gauteng', 'North West'], description: 'Deepening of existing boreholes and rehabilitation of clogged or damaged boreholes.', available: true },
-  { id: '3', title: 'Geophysical Water Survey', category: 'geophysics', priceType: 'fixed', priceRange: { min: 8000, max: 18000 }, coverageAreas: ['Gauteng', 'Free State', 'North West', 'Limpopo'], description: 'Resistivity and electromagnetic surveys to identify optimal drilling points.', available: true },
-  { id: '4', title: 'Pump Installation & Commissioning', category: 'pump_installation', priceType: 'quote', priceRange: { min: 3500, max: 15000 }, coverageAreas: ['Gauteng'], description: 'Expert installation of submersible pumps including electrical connections and testing.', available: false },
+  {
+    id: '1',
+    title: 'Professional Borehole Drilling',
+    category: 'Drilling',
+    priceType: 'per_meter',
+    priceRange: { min: 350, max: 600 },
+    coverageAreas: ['Gauteng', 'Mpumalanga', 'Limpopo'],
+    description: 'Complete borehole drilling services for residential, commercial, and agricultural applications up to 200m depth.',
+    available: true,
+  },
+  {
+    id: '2',
+    title: 'Borehole Deepening & Rehabilitation',
+    category: 'Maintenance',
+    priceType: 'quote',
+    priceRange: { min: 5000, max: 25000 },
+    coverageAreas: ['Gauteng', 'North West'],
+    description: 'Deepening of existing boreholes and rehabilitation of clogged or damaged boreholes.',
+    available: true,
+  },
+  {
+    id: '3',
+    title: 'Geophysical Water Survey',
+    category: 'Geophysics',
+    priceType: 'fixed',
+    priceRange: { min: 8000, max: 18000 },
+    coverageAreas: ['Gauteng', 'Free State', 'North West', 'Limpopo'],
+    description: 'Resistivity and electromagnetic surveys to identify optimal drilling points.',
+    available: true,
+  },
+  {
+    id: '4',
+    title: 'Pump Installation & Commissioning',
+    category: 'Pump Installation',
+    priceType: 'quote',
+    priceRange: { min: 3500, max: 15000 },
+    coverageAreas: ['Gauteng'],
+    description: 'Expert installation of submersible pumps including electrical connections and testing.',
+    available: false,
+  },
 ]
-
-const EMPTY_FORM = { title: '', category: '', priceType: 'quote', priceMin: '', priceMax: '', coverageAreas: [] as string[], description: '' }
 
 export default function ProviderServicesPage() {
   const [services, setServices] = useState(INITIAL_SERVICES)
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
-  const [form, setForm] = useState(EMPTY_FORM)
+  const [form, setForm] = useState({
+    title: '', category: '', priceType: 'quote',
+    priceMin: '', priceMax: '', description: '',
+  })
 
   const openAddForm = () => {
-    setForm(EMPTY_FORM)
+    setForm({ title: '', category: '', priceType: 'quote', priceMin: '', priceMax: '', description: '' })
     setEditId(null)
     setShowForm(true)
   }
@@ -46,7 +85,6 @@ export default function ProviderServicesPage() {
       priceType: service.priceType,
       priceMin: String(service.priceRange.min),
       priceMax: String(service.priceRange.max),
-      coverageAreas: service.coverageAreas,
       description: service.description,
     })
     setEditId(service.id)
@@ -66,7 +104,6 @@ export default function ProviderServicesPage() {
         category: form.category,
         priceType: form.priceType,
         priceRange: { min: Number(form.priceMin) || 0, max: Number(form.priceMax) || 0 },
-        coverageAreas: form.coverageAreas,
         description: form.description,
       } : s))
     } else {
@@ -76,185 +113,154 @@ export default function ProviderServicesPage() {
         category: form.category,
         priceType: form.priceType,
         priceRange: { min: Number(form.priceMin) || 0, max: Number(form.priceMax) || 0 },
-        coverageAreas: form.coverageAreas,
         description: form.description,
         available: true,
+        coverageAreas: ['Gauteng'],
       }
       setServices(prev => [...prev, newService])
     }
     setShowForm(false)
-    setForm(EMPTY_FORM)
+    setForm({ title: '', category: '', priceType: 'quote', priceMin: '', priceMax: '', description: '' })
     setEditId(null)
   }
 
-  const toggleCoverage = (prov: string) => {
-    setForm(f => ({
-      ...f,
-      coverageAreas: f.coverageAreas.includes(prov)
-        ? f.coverageAreas.filter(p => p !== prov)
-        : [...f.coverageAreas, prov]
-    }))
-  }
-
-  const getCategoryLabel = (id: string) => SERVICE_CATEGORIES.find(c => c.id === id)?.label || id
-
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex items-end justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Services</h1>
-          <p className="text-gray-600 mt-1">{services.length} services listed</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">My Services</h1>
+          <p className="text-gray-500 mt-1 text-[14px]">{services.length} services listed</p>
         </div>
-        <Button onClick={openAddForm}>
-          <Plus className="h-4 w-4 mr-2" /> Add Service
+        <Button onClick={openAddForm} className="h-9 text-[13px]"
+          style={{ background: 'linear-gradient(135deg, #0c4a6e, #0d9488)' }}>
+          <Plus className="h-4 w-4 mr-1.5" /> Add Service
         </Button>
       </div>
 
-      {/* Service Form Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setShowForm(false)} />
-          <Card className="relative z-10 w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowForm(false)} />
+          <Card className="relative z-10 w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto rounded-2xl">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="text-lg font-semibold">{editId ? 'Edit Service' : 'Add New Service'}</h2>
-              <button onClick={() => setShowForm(false)}><X className="h-5 w-5 text-gray-400" /></button>
+              <h2 className="text-[16px] font-semibold text-gray-900">{editId ? 'Edit Service' : 'Add New Service'}</h2>
+              <button onClick={() => setShowForm(false)} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                <X className="h-4 w-4 text-gray-400" />
+              </button>
             </div>
             <CardContent className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Service Title *</label>
+                <label className="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Service Title *</label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-[13px] bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-[#0c4a6e]/20 focus:border-[#0c4a6e]/40"
                   placeholder="e.g., Professional Borehole Drilling"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                <label className="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Category *</label>
                 <select
                   value={form.category}
                   onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-[13px] bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-[#0c4a6e]/20 focus:border-[#0c4a6e]/40"
                 >
                   <option value="">Select category</option>
-                  {SERVICE_CATEGORIES.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.label}</option>
+                  {['Drilling', 'Maintenance', 'Geophysics', 'Pump Installation', 'Water Treatment'].map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Description</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-[13px] bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-[#0c4a6e]/20 focus:border-[#0c4a6e]/40 resize-none"
                   placeholder="Describe your service..."
                 />
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Pricing Type</label>
+                  <label className="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Pricing</label>
                   <select
                     value={form.priceType}
                     onChange={(e) => setForm(f => ({ ...f, priceType: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm"
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-[13px] bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-[#0c4a6e]/20 focus:border-[#0c4a6e]/40"
                   >
                     <option value="quote">Get Quote</option>
                     <option value="fixed">Fixed</option>
                     <option value="per_meter">Per Meter</option>
-                    <option value="hourly">Hourly</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Min Price (ZAR)</label>
+                  <label className="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Min (ZAR)</label>
                   <input
                     type="number"
                     value={form.priceMin}
                     onChange={(e) => setForm(f => ({ ...f, priceMin: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm"
-                    placeholder="e.g., 350"
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-[13px] bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-[#0c4a6e]/20 focus:border-[#0c4a6e]/40"
+                    placeholder="350"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Max Price (ZAR)</label>
+                  <label className="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Max (ZAR)</label>
                   <input
                     type="number"
                     value={form.priceMax}
                     onChange={(e) => setForm(f => ({ ...f, priceMax: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm"
-                    placeholder="e.g., 600"
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-[13px] bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-[#0c4a6e]/20 focus:border-[#0c4a6e]/40"
+                    placeholder="600"
                   />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Coverage Areas</label>
-                <div className="flex flex-wrap gap-2">
-                  {PROVINCES.map((prov) => (
-                    <button
-                      key={prov}
-                      type="button"
-                      onClick={() => toggleCoverage(prov)}
-                      className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                        form.coverageAreas.includes(prov)
-                          ? 'bg-primary text-white border-primary'
-                          : 'bg-white text-gray-700 border-gray-300 hover:border-primary'
-                      }`}
-                    >
-                      {prov}
-                    </button>
-                  ))}
                 </div>
               </div>
             </CardContent>
             <div className="flex justify-end gap-3 p-6 border-t border-gray-100">
-              <Button variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
-              <Button onClick={handleSave} disabled={!form.title || !form.category}>
-                <Check className="h-4 w-4 mr-2" /> {editId ? 'Save Changes' : 'Add Service'}
+              <Button variant="outline" size="sm" onClick={() => setShowForm(false)} className="h-9 text-[13px]">Cancel</Button>
+              <Button size="sm" onClick={handleSave} disabled={!form.title || !form.category} className="h-9 text-[13px]"
+                style={{ background: 'linear-gradient(135deg, #0c4a6e, #0d9488)' }}>
+                <Check className="h-4 w-4 mr-1.5" /> {editId ? 'Save Changes' : 'Add Service'}
               </Button>
             </div>
           </Card>
         </div>
       )}
 
-      {/* Service Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {services.map((service) => (
-          <Card key={service.id} hover>
-            <CardContent className="p-6">
+          <Card key={service.id} hover className="group">
+            <CardContent className="p-5">
               <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Wrench className="h-5 w-5 text-primary" />
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 bg-[#0c4a6e]/5 rounded-lg">
+                    <Wrench className="h-4 w-4 text-[#0c4a6e]" />
                   </div>
-                  <Badge variant="secondary">{getCategoryLabel(service.category)}</Badge>
+                  <Badge variant="secondary" className="text-[10px]">{service.category}</Badge>
                 </div>
-                <Badge variant={service.available ? 'success' : 'warning'}>
+                <Badge variant={service.available ? 'success' : 'warning'} className="text-[10px]">
                   {service.available ? 'Available' : 'Unavailable'}
                 </Badge>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">{service.title}</h3>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{service.description}</p>
-              <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                <div className="flex items-center gap-1">
-                  <DollarSign className="h-4 w-4" />
-                  {service.priceType === 'quote' ? 'Get Quote' : service.priceType === 'per_meter' ? `R${service.priceRange.min} - R${service.priceRange.max}/m` : `R${service.priceRange.min} - R${service.priceRange.max}`}
-                </div>
+              <h3 className="text-[15px] font-semibold text-gray-900 mb-2">{service.title}</h3>
+              <p className="text-[12px] text-gray-500 mb-4 line-clamp-2 leading-relaxed">{service.description}</p>
+              <div className="flex items-center gap-1.5 text-[12px] text-gray-500 mb-3">
+                <DollarSign className="h-3.5 w-3.5" />
+                {service.priceType === 'quote' ? 'Get Quote' : service.priceType === 'per_meter' ? `R${service.priceRange.min} - R${service.priceRange.max}/m` : `R${service.priceRange.min} - R${service.priceRange.max}`}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {service.coverageAreas.map((area) => (
-                  <span key={area} className="flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                  <span key={area} className="flex items-center gap-1 text-[11px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md">
                     <MapPin className="h-3 w-3" /> {area}
                   </span>
                 ))}
               </div>
             </CardContent>
-            <CardFooter className="p-4 bg-gray-50 flex items-center justify-between">
-              <Button variant="outline" size="sm" onClick={() => openEditForm(service)}>
+            <CardFooter className="p-4 bg-gray-50/50 flex items-center justify-between border-t border-gray-100">
+              <Button variant="outline" size="sm" className="h-8 text-[12px]" onClick={() => openEditForm(service)}>
                 <Edit2 className="h-3.5 w-3.5 mr-1.5" /> Edit
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => toggleAvailability(service.id)}>
+              <Button variant="ghost" size="sm" className="h-8 text-[12px]" onClick={() => toggleAvailability(service.id)}>
                 {service.available ? (
                   <><EyeOff className="h-3.5 w-3.5 mr-1.5" /> Set Unavailable</>
                 ) : (
